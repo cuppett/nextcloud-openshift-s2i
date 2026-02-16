@@ -50,7 +50,7 @@ run_path() {
     local return_code=0
 
     if ! [ -d "${hook_folder_path}" ]; then
-        echo "=> Skipping the folder \"${hook_folder_path}\", because it doesn't exist"
+        echo "=> Skipping ${1} (directory ${hook_folder_path} does not exist)"
         return 0
     fi
 
@@ -59,20 +59,20 @@ run_path() {
     (
         find "${hook_folder_path}" -maxdepth 1 -iname '*.sh' -print | sort | while read -r script_file_path; do
             if ! [ -x "${script_file_path}" ]; then
-                echo "==> The script \"${script_file_path}\" was skipped, because it didn't have the executable flag"
+                echo "==> Skipped ${script_file_path} (not executable)"
                 continue
             fi
 
-            echo "==> Running the script (cwd: $(pwd)): \"${script_file_path}\""
+            echo "==> Running ${script_file_path}"
 
             run_as "${script_file_path}" || return_code="$?"
 
             if [ "${return_code}" -ne "0" ]; then
-                echo "==> Failed at executing \"${script_file_path}\". Exit code: ${return_code}"
+                echo "==> Failed ${script_file_path} - exit code ${return_code}"
                 exit 1
             fi
 
-            echo "==> Finished the script: \"${script_file_path}\""
+            echo "==> Finished ${script_file_path}"
         done
     )
 }
@@ -232,6 +232,19 @@ fix-permissions /var/www/
         fi
     done
 ) 9> /var/www/html/nextcloud-init-sync.lock
+
+# Configure Redis session handler if REDIS_HOST is set
+if [ -n "${REDIS_HOST+x}" ]; then
+    echo "Configuring Redis session handler"
+    {
+        echo 'session.save_handler = redis'
+        if [ -n "${REDIS_HOST_USER+x}" ]; then
+            echo "session.save_path = \"tcp://${REDIS_HOST}:${REDIS_HOST_PORT:=6379}?auth_user=${REDIS_HOST_USER}&auth_pass=${REDIS_HOST_PASSWORD}\""
+        else
+            echo "session.save_path = \"tcp://${REDIS_HOST}:${REDIS_HOST_PORT:=6379}?auth=${REDIS_HOST_PASSWORD}\""
+        fi
+    } > /usr/local/etc/php/conf.d/redis-session.ini
+fi
 
 run_path before-starting
 
