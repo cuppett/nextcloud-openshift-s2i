@@ -24,8 +24,8 @@ if (getenv('OBJECTSTORE_S3_BUCKET')) {
                 'port' => getenv('OBJECTSTORE_S3_PORT') ?: '',
                 'objectPrefix' => getenv("OBJECTSTORE_S3_OBJECT_PREFIX") ? getenv("OBJECTSTORE_S3_OBJECT_PREFIX") : "urn:oid:",
                 'storageClass' => getenv('OBJECTSTORE_S3_STORAGE_CLASS'),
-                'autocreate' => (strtolower($autocreate) === 'false' || $autocreate == false) ? false : true,
-                'use_ssl' => (strtolower($use_ssl) === 'false' || $use_ssl == false) ? false : true,
+                'autocreate' => strtolower($autocreate) !== 'false',
+                'use_ssl' => strtolower($use_ssl) !== 'false',
                 // required for some non Amazon S3 implementations
                 'use_path_style' => $use_path == true && strtolower($use_path) !== 'false',
                 // required for older protocol versions
