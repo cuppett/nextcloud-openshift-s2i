@@ -2,9 +2,9 @@
 
 source ${STI_SCRIPTS_PATH}/assemble
 
-NEXTCLOUD_VERSION=24.0.5
+NEXTCLOUD_VERSION=32.0.6
 
-curl -fsSL -o nextcloud.tar.bz2 "https://download.nextcloud.com/server/releases/nextcloud-${NEXTCLOUD_VERSION}.tar.bz2";
+curl -fsSL -o nextcloud.tar.bz2 "https://github.com/nextcloud-releases/server/releases/download/v${NEXTCLOUD_VERSION}/nextcloud-${NEXTCLOUD_VERSION}.tar.bz2";
 tar -xjf nextcloud.tar.bz2 -C ${HOME} --strip-components=1
 rm nextcloud.tar.bz2
 
