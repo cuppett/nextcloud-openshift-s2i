@@ -182,11 +182,13 @@ fix-permissions /var/www/
                     if [ -n "${NEXTCLOUD_TRUSTED_DOMAINS+x}" ]; then
                         echo "Setting trusted domains…"
                         NC_TRUSTED_DOMAIN_IDX=1
+                        set -f
                         for DOMAIN in $NEXTCLOUD_TRUSTED_DOMAINS ; do
                             DOMAIN=$(echo "$DOMAIN" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
                             run_as "php /var/www/html/occ config:system:set trusted_domains $NC_TRUSTED_DOMAIN_IDX --value=$DOMAIN"
                             NC_TRUSTED_DOMAIN_IDX=$(($NC_TRUSTED_DOMAIN_IDX+1))
                         done
+                        set +f
                     fi
 
                     if [ -n "${NEXTCLOUD_INIT_HTACCESS+x}" ]; then
@@ -215,6 +217,20 @@ fix-permissions /var/www/
             run_path post-upgrade
         fi
     fi
+
+    # Check for config file drift
+    for f in /opt/app-root/src/config/*.php; do
+        if [ -f "$f" ]; then
+            base=$(basename "$f")
+            if [ "$base" != "autoconfig.php" ] && [ -f "/var/www/html/config/$base" ]; then
+                if ! cmp -s "$f" "/var/www/html/config/$base"; then
+                    echo "WARNING: The config file $base differs between the image and the persistent volume."
+                    echo "This can happen when the image is updated or when manual changes are made to the config file."
+                    echo "Please review the differences and update the file in the persistent volume accordingly."
+                fi
+            fi
+        fi
+    done
 ) 9> /var/www/html/nextcloud-init-sync.lock
 
 run_path before-starting
