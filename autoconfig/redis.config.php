@@ -9,6 +9,10 @@ if (getenv('REDIS_HOST')) {
         ),
     );
 
+    if (getenv('REDIS_HOST_USER')) {
+        $CONFIG['redis']['user'] = (string) getenv('REDIS_HOST_USER');
+    }
+
     if (getenv('REDIS_HOST_PORT') !== false) {
         $CONFIG['redis']['port'] = (int)getenv('REDIS_HOST_PORT');
     } elseif (getenv('REDIS_HOST')[0] != '/') {
