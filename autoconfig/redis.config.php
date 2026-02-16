@@ -1,5 +1,5 @@
 <?php
-if (getenv('REDIS_HOST') && extension_loaded('redis')) {
+if (getenv('REDIS_HOST')) {
     $CONFIG = array(
         'memcache.distributed' => '\OC\Memcache\Redis',
         'memcache.locking' => '\OC\Memcache\Redis',
