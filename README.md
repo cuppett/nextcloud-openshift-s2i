@@ -4,23 +4,23 @@ Get NextCloud ready to run on OpenShift with
 
 ## Quick Start
 
-$ oc new-app quay.io/cuppett/ubi8-php:80~https://github.com/cuppett/nextcloud-openshift-s2i.git
+$ oc new-app quay.io/cuppett/ubi-php:83-ubi10~https://github.com/cuppett/nextcloud-openshift-s2i.git
 
-    --> Found container image 328ff90 (2 hours old) from quay.io for "quay.io/cuppett/ubi8-php:80"
+    --> Found container image 328ff90 (2 hours old) from quay.io for "quay.io/cuppett/ubi-php:83-ubi10"
     
-        Apache 2.4 with PHP 8.0 
-        ----------------------- 
-        PHP 8.0 available as container is a base platform for building and running various PHP 8.0 applications and frameworks. PHP is an HTML-embedded scripting language. PHP attempts to make it easy for developers to write dynamically generated web pages. PHP also offers built-in database integration for several commercial and non-commercial database management systems, so writing a database-enabled webpage with PHP is fairly simple. The most common use of PHP coding is probably as a replacement for CGI scripts.
-    
-        Tags: builder, php, php80, php-80
-    
-        * An image stream tag will be created as "ubi8-php:74" that will track the source image
+        Apache 2.4 with PHP 8.3
+        -----------------------
+        PHP 8.3 available as container is a base platform for building and running various PHP 8.3 applications and frameworks. PHP is an HTML-embedded scripting language. PHP attempts to make it easy for developers to write dynamically generated web pages. PHP also offers built-in database integration for several commercial and non-commercial database management systems, so writing a database-enabled webpage with PHP is fairly simple. The most common use of PHP coding is probably as a replacement for CGI scripts.
+
+        Tags: builder, php, php83, php-83
+
+        * An image stream tag will be created as "ubi-php:83-ubi10" that will track the source image
         * A source build using source code from https://github.com/cuppett/nextcloud-openshift-s2i.git will be created
           * The resulting image will be pushed to image stream tag "nextcloud-openshift-s2i:latest"
-          * Every time "ubi8-php:74" changes a new build will be triggered
-    
+          * Every time "ubi-php:83-ubi10" changes a new build will be triggered
+
     --> Creating resources ...
-    imagestream.image.openshift.io "ubi8-php" created
+    imagestream.image.openshift.io "ubi-php" created
     imagestream.image.openshift.io "nextcloud-openshift-s2i" created
     buildconfig.build.openshift.io "nextcloud-openshift-s2i" created
     deployment.apps "nextcloud-openshift-s2i" created
