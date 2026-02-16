@@ -4,13 +4,21 @@ if (getenv('OBJECTSTORE_S3_BUCKET')) {
     $use_path = getenv('OBJECTSTORE_S3_USEPATH_STYLE');
     $use_legacyauth = getenv('OBJECTSTORE_S3_LEGACYAUTH');
     $autocreate = getenv('OBJECTSTORE_S3_AUTOCREATE');
+    $key = getenv('OBJECTSTORE_S3_KEY') ?: '';
+    $secret = getenv('OBJECTSTORE_S3_SECRET') ?: '';
+    if (getenv('OBJECTSTORE_S3_KEY_FILE')) {
+        $key = trim(file_get_contents(getenv('OBJECTSTORE_S3_KEY_FILE')));
+    }
+    if (getenv('OBJECTSTORE_S3_SECRET_FILE')) {
+        $secret = trim(file_get_contents(getenv('OBJECTSTORE_S3_SECRET_FILE')));
+    }
     $CONFIG = array(
         'objectstore' => array(
             'class' => '\OC\Files\ObjectStore\S3',
             'arguments' => array(
                 'bucket' => getenv('OBJECTSTORE_S3_BUCKET'),
-                'key' => getenv('OBJECTSTORE_S3_KEY') ?: '',
-                'secret' => getenv('OBJECTSTORE_S3_SECRET') ?: '',
+                'key' => $key,
+                'secret' => $secret,
                 'region' => getenv('OBJECTSTORE_S3_REGION') ?: '',
                 'hostname' => getenv('OBJECTSTORE_S3_HOST') ?: '',
                 'port' => getenv('OBJECTSTORE_S3_PORT') ?: '',
