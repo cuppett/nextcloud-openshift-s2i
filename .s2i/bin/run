@@ -166,43 +166,51 @@ fix-permissions /var/www/
                 fi
 
                 if [ "$install" = true ]; then
-                    echo "starting nextcloud installation"
+                    echo "Starting nextcloud installation"
                     max_retries=10
                     try=0
-                    until php /var/www/html/occ maintenance:install $install_options || [ "$try" -gt "$max_retries" ]
+                    until [ "$try" -gt "$max_retries" ] || run_as "php /var/www/html/occ maintenance:install $install_options"
                     do
-                        echo "retrying install..."
+                        echo "Retrying install..."
                         try=$((try+1))
                         sleep 10s
                     done
                     if [ "$try" -gt "$max_retries" ]; then
-                        echo "installing of nextcloud failed!"
+                        echo "Installing of Nextcloud failed!"
                         exit 1
                     fi
                     if [ -n "${NEXTCLOUD_TRUSTED_DOMAINS+x}" ]; then
-                        echo "setting trusted domains…"
+                        echo "Setting trusted domains…"
                         NC_TRUSTED_DOMAIN_IDX=1
                         for DOMAIN in $NEXTCLOUD_TRUSTED_DOMAINS ; do
                             DOMAIN=$(echo "$DOMAIN" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
-                            php /var/www/html/occ config:system:set trusted_domains $NC_TRUSTED_DOMAIN_IDX --value=$DOMAIN
+                            run_as "php /var/www/html/occ config:system:set trusted_domains $NC_TRUSTED_DOMAIN_IDX --value=$DOMAIN"
                             NC_TRUSTED_DOMAIN_IDX=$(($NC_TRUSTED_DOMAIN_IDX+1))
                         done
                     fi
 
+                    if [ -n "${NEXTCLOUD_INIT_HTACCESS+x}" ]; then
+                        run_as "php /var/www/html/occ maintenance:update:htaccess"
+                    fi
+
                     run_path post-installation
                 else
-                    echo "running web-based installer on first connect!"
+                    echo "Please use the web-based installer to finish setup! You can remove this text from output by setting the NEXTCLOUD_ADMIN_USER and NEXTCLOUD_ADMIN_PASSWORD environment variables"
                 fi
             fi
         #upgrade
         else
             run_path pre-upgrade
-            php /var/www/html/occ upgrade
+            run_as 'php /var/www/html/occ upgrade'
 
-            php /var/www/html/occ app:list | sed -n "/Enabled:/,/Disabled:/p" > /tmp/list_after
+            run_as 'php /var/www/html/occ app:list' | sed -n "/Enabled:/,/Disabled:/p" > /tmp/list_after
             echo "The following apps have been disabled:"
             diff /tmp/list_before /tmp/list_after | grep '<' | cut -d- -f2 | cut -d: -f1
             rm -f /tmp/list_before /tmp/list_after
+
+            if [ -n "${NEXTCLOUD_INIT_HTACCESS+x}" ]; then
+                run_as 'php /var/www/html/occ maintenance:update:htaccess'
+            fi
 
             run_path post-upgrade
         fi
