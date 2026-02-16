@@ -23,6 +23,7 @@ if (getenv('OBJECTSTORE_S3_BUCKET')) {
                 'hostname' => getenv('OBJECTSTORE_S3_HOST') ?: '',
                 'port' => getenv('OBJECTSTORE_S3_PORT') ?: '',
                 'objectPrefix' => getenv("OBJECTSTORE_S3_OBJECT_PREFIX") ? getenv("OBJECTSTORE_S3_OBJECT_PREFIX") : "urn:oid:",
+                'storageClass' => getenv('OBJECTSTORE_S3_STORAGE_CLASS'),
                 'autocreate' => (strtolower($autocreate) === 'false' || $autocreate == false) ? false : true,
                 'use_ssl' => (strtolower($use_ssl) === 'false' || $use_ssl == false) ? false : true,
                 // required for some non Amazon S3 implementations
