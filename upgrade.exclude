@@ -4,6 +4,7 @@
 /custom_apps/
 /data/
 /httpd-cfg
+/nextcloud-init-sync.lock
 /php-post-assemble
 /themes/
 /upgrade.exclude

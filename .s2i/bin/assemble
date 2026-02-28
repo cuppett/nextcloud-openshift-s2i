@@ -2,9 +2,11 @@
 
 source ${STI_SCRIPTS_PATH}/assemble
 
-NEXTCLOUD_VERSION=32.0.6
+NEXTCLOUD_VERSION=33.0.0
 
-curl -fsSL -o nextcloud.tar.bz2 "https://github.com/nextcloud-releases/server/releases/download/v${NEXTCLOUD_VERSION}/nextcloud-${NEXTCLOUD_VERSION}.tar.bz2";
+curl -fsSL -o nextcloud.tar.bz2 "https://download.nextcloud.com/server/releases/nextcloud-${NEXTCLOUD_VERSION}.tar.bz2"
+curl -fsSL "https://download.nextcloud.com/server/releases/nextcloud-${NEXTCLOUD_VERSION}.tar.bz2.sha256" \
+    | awk '/\.tar\.bz2$/ {print $1 "  nextcloud.tar.bz2"}' | sha256sum -c -
 tar -xjf nextcloud.tar.bz2 -C ${HOME} --strip-components=1
 rm nextcloud.tar.bz2
 
@@ -12,10 +14,17 @@ fix-permissions ${HOME}/
 fix-permissions /var/www/
 
 mkdir -p ${HOME}/data
-mkdir ${HOME}/custom_apps
+mkdir -p ${HOME}/custom_apps
 rm -fR ${HOME}/nginx-cfg
 
 chmod +x ${HOME}/occ
 
 mv autoconfig/* config/
 rmdir autoconfig
+
+# Supplemental opcache settings not supported by sclorg templating
+cat > /etc/php.d/20-opcache-nextcloud.ini << 'EOF'
+opcache.interned_strings_buffer=16
+opcache.jit=1255
+opcache.jit_buffer_size=128M
+EOF
